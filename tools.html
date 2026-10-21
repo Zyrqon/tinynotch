@@ -3,76 +3,98 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TinyNotch &middot; Tool packs</title>
+<title>TinyNotch · Tool packs</title>
 <style>
-:root { color-scheme: dark; }
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { background: #0b0d12; color: #e8eaf0; font: 16px/1.6 -apple-system, "SF Pro Text", "Segoe UI", sans-serif; }
-.wrap { max-width: 780px; margin: 0 auto; padding: 56px 24px 80px; }
-.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: #e8eaf0; font-weight: 700; margin-bottom: 40px; }
-.brand .logo { width: 26px; height: 26px; border-radius: 8px; background: linear-gradient(135deg, #5eead4, #0ea5e9); }
-h1 { font-size: 40px; letter-spacing: -0.02em; margin-bottom: 12px; }
-.lead { color: #9aa3b2; max-width: 560px; margin-bottom: 36px; }
-.step { display: flex; gap: 14px; margin-bottom: 14px; }
-.step b { color: #5eead4; font-variant-numeric: tabular-nums; }
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; margin: 28px 0 40px; }
-.pack { display: block; background: #141822; border: 1px solid #232a38; border-radius: 16px; padding: 18px; text-decoration: none; color: inherit; transition: transform .18s, border-color .18s; }
-.pack:hover { transform: translateY(-3px); border-color: #5eead4; }
-.pack-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
-.pack-name { font-weight: 700; font-size: 17px; }
-.pack-count { color: #9aa3b2; font-size: 13px; }
-.pack-desc { color: #9aa3b2; font-size: 13.5px; margin-bottom: 12px; }
-.pack-cta { color: #5eead4; font-weight: 600; font-size: 14px; }
-.note { background: #141822; border: 1px solid #232a38; border-radius: 16px; padding: 18px 20px; color: #9aa3b2; font-size: 14.5px; }
-.note code { background: #0b0d12; padding: 2px 7px; border-radius: 6px; font-size: 13px; color: #5eead4; }
-footer { margin-top: 48px; color: #6b7383; font-size: 13px; }
-footer a { color: #9aa3b2; }
+:root{
+  --bg:#050508; --panel:#0c0c13; --panel2:#101018; --line:rgba(255,255,255,.08);
+  --text:#ededf2; --dim:#8b8b99; --dimmer:#757582; --teal:#5eead4;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font:16px/1.6 -apple-system,"SF Pro Text","Segoe UI",sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+.grid-bg{position:fixed;inset:0;pointer-events:none;
+  background-image:radial-gradient(rgba(255,255,255,.055) 1px,transparent 1px);background-size:26px 26px;
+  -webkit-mask-image:radial-gradient(ellipse 90% 45% at 50% 0%,#000 30%,transparent 75%);
+  mask-image:radial-gradient(ellipse 90% 45% at 50% 0%,#000 30%,transparent 75%)}
+.glow{position:fixed;inset:0;pointer-events:none;
+  background:radial-gradient(720px 340px at 50% -120px,rgba(94,234,212,.09),transparent 70%),
+             radial-gradient(560px 300px at 82% 8%,rgba(167,139,250,.07),transparent 70%)}
+.wrap{max-width:820px;margin:0 auto;padding:48px 24px 80px;position:relative;z-index:2}
+.mono{font-family:var(--mono)}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text);font-weight:700;margin-bottom:44px;width:fit-content}
+.brand .logo{width:26px;height:26px;border-radius:8px;background:linear-gradient(160deg,#17171f,#0a0a10);border:1px solid var(--line);display:grid;place-items:center}
+.brand .logo::before{content:"";width:12px;height:5px;border-radius:0 0 8px 8px;background:#000;box-shadow:0 1px 0 rgba(255,255,255,.14)}
+.badge{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12px;color:var(--dim);
+  border:1px solid var(--line);border-radius:99px;padding:6px 14px;background:rgba(255,255,255,.03);margin-bottom:18px}
+.badge i{width:6px;height:6px;border-radius:50%;background:var(--teal);box-shadow:0 0 8px rgba(94,234,212,.8)}
+h1{font-size:clamp(32px,5vw,44px);letter-spacing:-.03em;font-weight:800;line-height:1.08}
+.lead{color:var(--dim);max-width:560px;margin:14px 0 34px;line-height:1.65}
+.lead strong{color:var(--text);font-weight:600}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-bottom:40px}
+.step{display:flex;gap:12px;align-items:flex-start;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.step b{flex:none;font-family:var(--mono);width:24px;height:24px;border-radius:7px;background:rgba(94,234,212,.1);color:var(--teal);display:grid;place-items:center;font-size:12px}
+.step span{font-size:13.5px;color:var(--dim);line-height:1.5} .step strong{color:var(--text)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px;margin-bottom:40px}
+.pack{display:block;background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:14px;padding:18px;text-decoration:none;color:inherit;transition:transform .18s,border-color .18s,box-shadow .2s}
+.pack:hover{transform:translateY(-3px);border-color:rgba(94,234,212,.4);box-shadow:0 12px 36px rgba(0,0,0,.4)}
+.pack-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;gap:8px}
+.pack-name{font-weight:700;font-size:16.5px;letter-spacing:-.01em}
+.pack-count{color:var(--dim);font-size:12px;font-family:var(--mono)}
+.pack-desc{color:var(--dim);font-size:13px;margin-bottom:12px;line-height:1.5}
+.pack-cta{color:var(--teal);font-weight:600;font-size:13px;font-family:var(--mono)}
+.note{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:18px 20px;color:var(--dim);font-size:14px;line-height:1.6}
+.note code{font-family:var(--mono);font-size:12.5px;background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:6px;padding:2px 7px;color:var(--teal)}
+footer{margin-top:48px;color:var(--dimmer);font-size:12.5px;font-family:var(--mono)}
+footer a{color:var(--dim);text-decoration:none} footer a:hover{color:var(--text)}
 </style>
 </head>
 <body>
+<div class="grid-bg"></div>
+<div class="glow"></div>
 <div class="wrap">
   <a class="brand" href="index.html"><span class="logo"></span> TinyNotch</a>
+  <div class="badge"><i></i>28 core · 6 packs · 100 total</div>
   <h1>Tool packs</h1>
-  <p class="lead">TinyNotch ships with 28 core tools built in. Everything else comes as packs &mdash; like add&ndash;ons in Blender. Build from source and all 100 tools are already on.</p>
-  <div>
-    <div class="step"><b>1.</b><span>Download a pack below (.json file).</span></div>
-    <div class="step"><b>2.</b><span>In TinyNotch: Tools tab &rarr; &ldquo;Packs folder&rdquo; button.</span></div>
-    <div class="step"><b>3.</b><span>Drop the .json in and toggle &ldquo;Base&rdquo; off. The pack is installed.</span></div>
+  <p class="lead">TinyNotch ships with <strong>28 core tools</strong> built in. Everything else comes as packs — like add-ons in Blender. Build from source and <strong>all 100 tools are already on</strong>.</p>
+  <div class="steps">
+    <div class="step"><b>1</b><span><strong>Download a pack</strong> below (.json file).</span></div>
+    <div class="step"><b>2</b><span>In TinyNotch: Tools tab → <strong>“Packs folder”</strong> button.</span></div>
+    <div class="step"><b>3</b><span>Drop the .json in and toggle <strong>“Base”</strong> off. The pack is installed.</span></div>
   </div>
   <div class="grid">
-<a class="pack" href="https://github.com/Zyrqon/tinynotch/raw/main/packs/pack-system.json" download>
-    <div class="pack-head"><span class="pack-name">Система</span><span class="pack-count">15 tools</span></div>
-    <div class="pack-desc">Download the .json pack and drop it into the packs folder inside TinyNotch.</div>
-    <div class="pack-cta">Download pack &rarr;</div>
-  </a>
-<a class="pack" href="https://github.com/Zyrqon/tinynotch/raw/main/packs/pack-media.json" download>
-    <div class="pack-head"><span class="pack-name">Медиа</span><span class="pack-count">16 tools</span></div>
-    <div class="pack-desc">Download the .json pack and drop it into the packs folder inside TinyNotch.</div>
-    <div class="pack-cta">Download pack &rarr;</div>
-  </a>
-<a class="pack" href="https://github.com/Zyrqon/tinynotch/raw/main/packs/pack-code.json" download>
-    <div class="pack-head"><span class="pack-name">Код</span><span class="pack-count">10 tools</span></div>
-    <div class="pack-desc">Download the .json pack and drop it into the packs folder inside TinyNotch.</div>
-    <div class="pack-cta">Download pack &rarr;</div>
-  </a>
-<a class="pack" href="https://github.com/Zyrqon/tinynotch/raw/main/packs/pack-info.json" download>
-    <div class="pack-head"><span class="pack-name">Инфо</span><span class="pack-count">10 tools</span></div>
-    <div class="pack-desc">Download the .json pack and drop it into the packs folder inside TinyNotch.</div>
-    <div class="pack-cta">Download pack &rarr;</div>
-  </a>
-<a class="pack" href="https://github.com/Zyrqon/tinynotch/raw/main/packs/pack-time.json" download>
-    <div class="pack-head"><span class="pack-name">Время</span><span class="pack-count">11 tools</span></div>
-    <div class="pack-desc">Download the .json pack and drop it into the packs folder inside TinyNotch.</div>
-    <div class="pack-cta">Download pack &rarr;</div>
-  </a>
-<a class="pack" href="https://github.com/Zyrqon/tinynotch/raw/main/packs/pack-games.json" download>
-    <div class="pack-head"><span class="pack-name">Игры</span><span class="pack-count">10 tools</span></div>
-    <div class="pack-desc">Download the .json pack and drop it into the packs folder inside TinyNotch.</div>
-    <div class="pack-cta">Download pack &rarr;</div>
-  </a>
+    <a class="pack" href="packs/pack-system.json" download>
+      <div class="pack-head"><span class="pack-name">System</span><span class="pack-count">15 tools</span></div>
+      <div class="pack-desc">Processes, disk, network, power — the machine under the notch.</div>
+      <div class="pack-cta">download .json →</div>
+    </a>
+    <a class="pack" href="packs/pack-media.json" download>
+      <div class="pack-head"><span class="pack-name">Media</span><span class="pack-count">16 tools</span></div>
+      <div class="pack-desc">Converters, screenshots, audio and video helpers.</div>
+      <div class="pack-cta">download .json →</div>
+    </a>
+    <a class="pack" href="packs/pack-code.json" download>
+      <div class="pack-head"><span class="pack-name">Code</span><span class="pack-count">10 tools</span></div>
+      <div class="pack-desc">Formatters, hashes, base64, git helpers.</div>
+      <div class="pack-cta">download .json →</div>
+    </a>
+    <a class="pack" href="packs/pack-info.json" download>
+      <div class="pack-head"><span class="pack-name">Info</span><span class="pack-count">10 tools</span></div>
+      <div class="pack-desc">Lookups, units, encodings, quick reference.</div>
+      <div class="pack-cta">download .json →</div>
+    </a>
+    <a class="pack" href="packs/pack-time.json" download>
+      <div class="pack-head"><span class="pack-name">Time</span><span class="pack-count">11 tools</span></div>
+      <div class="pack-desc">Timers, timezones, countdowns, epoch math.</div>
+      <div class="pack-cta">download .json →</div>
+    </a>
+    <a class="pack" href="packs/pack-games.json" download>
+      <div class="pack-head"><span class="pack-name">Games</span><span class="pack-count">10 tools</span></div>
+      <div class="pack-desc">Small distractions for the five-minute break.</div>
+      <div class="pack-cta">download .json →</div>
+    </a>
   </div>
-  <div class="note">Building from source? Run <code>swift build</code> and every tool works out of the box &mdash; packs are optional add&ndash;ons, not a paywall.</div>
-  <footer>Part of <a href="index.html">TinyNotch</a> &middot; open source, MIT-based (original Notchly by oleksandrsenko)</footer>
+  <div class="note">Building from source? Run <code>swift build</code> and every tool works out of the box — packs are optional add-ons, not a paywall.</div>
+  <footer>Part of <a href="index.html">TinyNotch</a> · open source, MIT-based (original Notchly by oleksandrsenko)</footer>
 </div>
 </body>
 </html>
