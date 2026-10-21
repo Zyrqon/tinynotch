@@ -178,6 +178,7 @@ struct TimerView: View {
                         HStack(spacing: 8) {
                             RoundButton(symbol: countdown.isPaused ? "play.fill" : "pause.fill",
                                         help: countdown.isPaused ? L("Продолжить") : L("Пауза")) { countdown.togglePause() }
+                            RoundButton(symbol: "plus", help: L("Добавить минуту")) { countdown.step(seconds: 60) }
                             RoundButton(symbol: "arrow.counterclockwise", help: L("Сбросить")) { countdown.reset() }
                             RoundButton(symbol: "plus", help: L("Добавить минуту")) { countdown.step(seconds: 60) }
                         }
