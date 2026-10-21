@@ -1,0 +1,19 @@
+{
+  "id": "pack-time",
+  "name": "Время",
+  "version": "1.0.0",
+  "author": "Zyrqon",
+  "tools": [
+    "pomodoro",
+    "metronome",
+    "stopwatch",
+    "countdownDate",
+    "worldClock",
+    "backToTask",
+    "stretchReminder",
+    "waterCounter",
+    "breathe",
+    "quoteOfDay",
+    "jokeOfDay"
+  ]
+}

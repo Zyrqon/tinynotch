@@ -1,0 +1,24 @@
+{
+  "id": "pack-media",
+  "name": "Медиа",
+  "version": "1.0.0",
+  "author": "Zyrqon",
+  "tools": [
+    "shotArea",
+    "shotWindow",
+    "ocrShot",
+    "micRecord",
+    "voiceNotes",
+    "imgConvertExt",
+    "pdfCompress",
+    "pdfMerge",
+    "pdfSplit",
+    "imgRotate",
+    "imgWatermark",
+    "videoDownload",
+    "videoAudio",
+    "videoGif",
+    "videoCompress",
+    "batchRename"
+  ]
+}

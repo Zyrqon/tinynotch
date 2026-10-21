@@ -1,0 +1,18 @@
+{
+  "id": "pack-games",
+  "name": "Игры",
+  "version": "1.0.0",
+  "author": "Zyrqon",
+  "tools": [
+    "game2048",
+    "snake",
+    "mines",
+    "tamagotchi",
+    "siteBlocker",
+    "pomodoroStats",
+    "hotkeyCheat",
+    "sizeConvert",
+    "tzConvert",
+    "pasteClean"
+  ]
+}

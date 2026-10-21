@@ -1,0 +1,18 @@
+{
+  "id": "pack-info",
+  "name": "Инфо",
+  "version": "1.0.0",
+  "author": "Zyrqon",
+  "tools": [
+    "weatherNow",
+    "ratesLive",
+    "quickSticky",
+    "shoppingList",
+    "rssFeed",
+    "hnFeed",
+    "birthdaysNear",
+    "tgSelf",
+    "scratchpad",
+    "sysSchedule"
+  ]
+}
