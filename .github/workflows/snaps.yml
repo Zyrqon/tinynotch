@@ -1,0 +1,23 @@
+name: snaps
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  snaps:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build
+        run: swift build 2>&1 | tee build.log
+      - name: Render snapshots
+        run: swift run Notchly --snapshots snapper-out
+      - name: Upload snapshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: snaps
+          path: |
+            snapper-out/
+            build.log
+          if-no-files-found: error

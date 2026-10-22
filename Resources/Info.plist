@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleName</key>
+    <string>Notchly</string>
+    <key>CFBundleDisplayName</key>
+    <string>Notchly</string>
+    <key>CFBundleIconFile</key>
+    <string>AppIcon</string>
+    <key>CFBundleIdentifier</key>
+    <string>dev.notchly.app</string>
+    <key>CFBundleURLTypes</key>
+    <array>
+        <dict>
+            <key>CFBundleURLName</key>
+            <string>dev.notchly.app.pack</string>
+            <key>CFBundleURLSchemes</key>
+            <array>
+                <string>tinynotch</string>
+            </array>
+        </dict>
+    </array>
+    <key>CFBundleExecutable</key>
+    <string>Notchly</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>CFBundleShortVersionString</key>
+    <string>1.0</string>
+    <key>CFBundleVersion</key>
+    <string>1</string>
+    <key>LSMinimumSystemVersion</key>
+    <string>14.0</string>
+    <key>LSUIElement</key>
+    <true/>
+    <key>CFBundleDevelopmentRegion</key>
+    <string>ru</string>
+    <key>CFBundleLocalizations</key>
+    <array>
+        <string>ru</string>
+        <string>en</string>
+    </array>
+    <key>NSHighResolutionCapable</key>
+    <true/>
+    <key>NSBluetoothAlwaysUsageDescription</key>
+    <string>Нужно, чтобы показывать подключение и заряд наушников.</string>
+    <key>NSLocationUsageDescription</key>
+    <string>Нужно, чтобы показывать погоду для вашего города.</string>
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>Нужно, чтобы показывать погоду для вашего города.</string>
+    <key>NSAudioCaptureUsageDescription</key>
+    <string>Нужно, чтобы менять громкость отдельных приложений.</string>
+    <key>NSCalendarsFullAccessUsageDescription</key>
+    <string>Нужно, чтобы напоминать о встречах за 10 и 5 минут.</string>
+    <key>NSCalendarsUsageDescription</key>
+    <string>Нужно, чтобы напоминать о встречах за 10 и 5 минут.</string>
+    <key>NSDesktopFolderUsageDescription</key>
+    <string>Нужно, чтобы сохранять снимки экрана с рабочего стола в буфер обмена Notchly (если вы это включили).</string>
+    <key>NSAppleEventsUsageDescription</key>
+    <string>Нужно, чтобы показывать и переключать треки в Apple Music и Spotify.</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Показывает статус печати с принтера Bambu Lab по локальной сети.</string>
+</dict>
+</plist>

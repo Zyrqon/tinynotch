@@ -1,0 +1,9 @@
+/* Тексты системных запросов доступа для английской macOS. */
+"NSBluetoothAlwaysUsageDescription" = "Used to show when headphones connect and their battery level.";
+"NSLocationUsageDescription" = "Used to show the weather for your city.";
+"NSLocationWhenInUseUsageDescription" = "Used to show the weather for your city.";
+"NSAudioCaptureUsageDescription" = "Used to change the volume of individual apps.";
+"NSCalendarsFullAccessUsageDescription" = "Used to remind you about meetings 10 and 5 minutes before.";
+"NSCalendarsUsageDescription" = "Used to remind you about meetings 10 and 5 minutes before.";
+"NSDesktopFolderUsageDescription" = "Used to keep screenshots saved to the Desktop in Notchly's clipboard (if you turned it on).";
+"NSAppleEventsUsageDescription" = "Used to show and control tracks in Apple Music and Spotify.";
