@@ -5,6 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TinyNotch — the notch that works for you</title>
 <meta name="description" content="TinyNotch turns the MacBook notch into a living island: AI agents you approve from the notch, 100 built-in tools, music, clipboard, shelf. Open source, MIT.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%232dd4bf'/%3E%3Cstop offset='1' stop-color='%23a78bfa'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Crect x='24' y='0' width='16' height='9' rx='3' fill='%230a0d12'/%3E%3C/svg%3E">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="TinyNotch">
+<meta property="og:title" content="TinyNotch — the notch that works for you">
+<meta property="og:description" content="AI agents you approve from the notch, 100 built-in tools, music, clipboard, shelf. Open source, MIT.">
+<meta property="og:url" content="https://zyrqon.github.io/tinynotch/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="TinyNotch — the notch that works for you">
+<meta name="twitter:description" content="AI agents you approve from the notch, 100 built-in tools, music, clipboard, shelf. Open source, MIT.">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"SoftwareApplication","name":"TinyNotch","operatingSystem":"macOS 14+","applicationCategory":"UtilitiesApplication","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"license":"https://opensource.org/licenses/MIT","description":"TinyNotch turns the MacBook notch into a living island: AI agents you approve from the notch, 100 built-in tools, music, clipboard history, shelf.","codeRepository":"https://github.com/Zyrqon/tinynotch"}
+</script>
 <style>
   :root{
     --bg:#0a0d12; --panel:#10151c; --panel2:#141a23; --line:rgba(255,255,255,.07);
@@ -124,8 +136,25 @@
   .credits a{color:var(--teal);text-decoration:none} .credits a:hover{text-decoration:underline}
   footer{border-top:1px solid var(--line);padding:26px 0;color:var(--dimmer);font:12.5px var(--mono);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
   footer a{color:var(--dim);text-decoration:none} footer a:hover{color:var(--text)}
+  /* mobile menu */
+  .menu-btn{display:none;background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:10px;width:36px;height:36px;color:var(--text);cursor:pointer;place-items:center;flex:none}
+  .mnav{position:fixed;top:66px;left:14px;right:14px;z-index:60;background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:8px;display:none;flex-direction:column;box-shadow:0 24px 60px rgba(0,0,0,.65)}
+  .mnav.open{display:flex}
+  .mnav a{color:var(--text);text-decoration:none;font-size:14px;font-weight:600;padding:12px 14px;border-radius:10px}
+  .mnav a:hover{background:rgba(255,255,255,.05)}
+  /* faq */
+  .faq{padding:88px 0 8px}
+  .faq-list{margin-top:34px;display:grid;gap:10px;max-width:760px}
+  .faq-list details{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 20px}
+  .faq-list summary{cursor:pointer;font-weight:600;font-size:14.5px;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:12px}
+  .faq-list summary::-webkit-details-marker{display:none}
+  .faq-list summary::after{content:"+";color:var(--teal);font:600 16px var(--mono);transition:transform .2s}
+  .faq-list details[open] summary::after{transform:rotate(45deg)}
+  .faq-list details p{color:var(--dim);font-size:13.5px;line-height:1.65;margin-top:10px}
+  .faq-list code{font:12px var(--mono);background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:6px;padding:2px 6px;color:var(--teal)}
   @media (max-width:900px){
     .hero{grid-template-columns:1fr;gap:40px;padding-top:56px}
+    .menu-btn{display:grid}
     .bento{grid-template-columns:1fr 1fr}
     .stats{grid-template-columns:repeat(2,1fr)}
     .steps{grid-template-columns:1fr}
@@ -137,6 +166,19 @@
     .island{animation-name:open-sm}
     @keyframes open-sm{0%,26%,100%{width:150px;height:30px}34%,74%{width:300px;height:92px}}
     .wall{height:280px}
+    /* keep the island content inside its box on small screens */
+    .content .cell:nth-child(2){display:none}
+    .content{gap:12px}
+    /* legibility: brighter, bigger small text */
+    .cap{font-size:12.5px;color:var(--dim)}
+    .meta{font-size:12.5px;color:var(--dim)}
+    .badge{font-size:12px;color:var(--dim)}
+    .stat .n{font-size:26px}
+    .credits{font-size:13px;color:var(--dim)}
+    footer{color:var(--dim)}
+    /* tighter vertical rhythm */
+    .features,.packs,.build,.faq{padding-top:64px}
+    .hero{padding-top:64px}
   }
 </style>
 </head>
@@ -148,10 +190,21 @@
     <nav>
       <a href="#features">Features</a>
       <a href="tools.html">Tool packs</a>
+      <a href="#faq">FAQ</a>
       <a href="#build">Build</a>
       <a class="btn btn-ghost" style="padding:8px 16px;font-size:13px" href="https://github.com/Zyrqon/tinynotch">GitHub</a>
+      <button class="menu-btn" aria-label="Menu" onclick="document.getElementById('mnav').classList.toggle('open')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
     </nav>
   </header>
+  <div class="mnav" id="mnav">
+    <a href="#features" onclick="document.getElementById('mnav').classList.remove('open')">Features</a>
+    <a href="tools.html" onclick="document.getElementById('mnav').classList.remove('open')">Tool packs</a>
+    <a href="#faq" onclick="document.getElementById('mnav').classList.remove('open')">FAQ</a>
+    <a href="#build" onclick="document.getElementById('mnav').classList.remove('open')">Build</a>
+    <a href="https://github.com/Zyrqon/tinynotch" onclick="document.getElementById('mnav').classList.remove('open')">GitHub</a>
+  </div>
 
   <section class="hero">
     <div>
@@ -159,7 +212,8 @@
       <h1 style="margin-top:22px">The notch that<br><span class="grad">works for you.</span></h1>
       <p class="sub">TinyNotch turns the MacBook notch into a living island: <strong>AI agents you approve from the notch</strong>, 100 built-in tools, music, clipboard history, a drag-and-drop shelf and real notifications. One quiet black bar.</p>
       <div class="cta">
-        <a class="btn btn-primary" href="tools.html">Install tool packs</a>
+        <a class="btn btn-primary" href="https://github.com/Zyrqon/tinynotch/releases/latest/download/Notchly-1.0.dmg" download>Download for Mac</a>
+        <a class="btn btn-ghost" href="tools.html">Install tool packs</a>
         <a class="btn btn-ghost" href="https://github.com/Zyrqon/tinynotch">Star on GitHub</a>
       </div>
       <div class="meta">macOS 14+ · Swift · no Xcode required</div>
@@ -273,13 +327,25 @@
     </div>
   </section>
 
+  <section class="faq" id="faq">
+    <div class="eyebrow">FAQ</div>
+    <h2>Questions people ask</h2>
+    <div class="faq-list">
+      <details open><summary>Do I need Xcode?</summary><p>No. Command Line Tools (<code>xcode-select --install</code>) are the whole toolchain, and the build is one command.</p></details>
+      <details><summary>Which macOS does it support?</summary><p>macOS 14 Sonoma or newer, Apple Silicon.</p></details>
+      <details><summary>Is it free?</summary><p>Yes. MIT license, source on GitHub. Tool packs are add-ons, not a paywall.</p></details>
+      <details><summary>How do tool packs install?</summary><p>One click on the <a href="tools.html">packs page</a> and the island downloads the pack itself. No app running? Download the .json and drop it into the packs folder.</p></details>
+      <details><summary>What can agents do from the notch?</summary><p>Approve or deny each tool use, watch live output, and get notified the moment a run finishes or waits for you.</p></details>
+    </div>
+  </section>
+
   <section class="credits">
     <p><strong style="color:var(--text)">Credits.</strong> TinyNotch is built on the open-source <a href="https://github.com/oleksandrsenko/Notchly">Notchly</a> project by oleksandrsenko (MIT) and extends it with the agents hub, the 100-tool registry, the printer bridge and more. Released under the MIT license.</p>
   </section>
 
   <footer>
     <div>© 2026 TinyNotch · MIT</div>
-    <div><a href="https://github.com/Zyrqon/tinynotch">github.com/Zyrqon/tinynotch</a></div>
+    <div><a href="tools.html">Tool packs</a> · <a href="#features">Features</a> · <a href="https://github.com/Zyrqon/tinynotch">GitHub</a> · <a href="https://github.com/oleksandrsenko/Notchly">Notchly base</a></div>
   </footer>
 </div>
 <script>

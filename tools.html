@@ -5,6 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TinyNotch — tool packs</title>
 <meta name="description" content="Install TinyNotch tool packs from the browser in one click, like Blender add-ons.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%232dd4bf'/%3E%3Cstop offset='1' stop-color='%23a78bfa'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Crect x='24' y='0' width='16' height='9' rx='3' fill='%230a0d12'/%3E%3C/svg%3E">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="TinyNotch">
+<meta property="og:title" content="TinyNotch — tool packs">
+<meta property="og:description" content="Install TinyNotch tool packs from the browser in one click, like Blender add-ons.">
+<meta property="og:url" content="https://zyrqon.github.io/tinynotch/tools.html">
 <style>
   :root{
     --bg:#0a0d12; --panel:#10151c; --panel2:#141a23; --line:rgba(255,255,255,.07);
@@ -52,6 +58,9 @@
     display:flex;flex-direction:column;transition:transform .2s ease,border-color .2s,box-shadow .2s}
   .pack:hover{transform:translateY(-3px);border-color:rgba(45,212,191,.3);box-shadow:0 16px 44px rgba(0,0,0,.45)}
   .pack-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .pack-title{display:flex;align-items:center;gap:11px}
+  .pack-ic{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;flex:none;color:var(--teal2);
+    background:linear-gradient(160deg,rgba(45,212,191,.12),rgba(255,255,255,.02));border:1px solid rgba(45,212,191,.18)}
   .pack-name{font-size:16px;font-weight:700;letter-spacing:-.01em}
   .pack-count{font:11px var(--mono);color:var(--teal);border:1px solid rgba(45,212,191,.25);border-radius:99px;padding:3px 10px;white-space:nowrap}
   .pack-desc{color:var(--dim);font-size:13.5px;line-height:1.65;margin-top:10px;flex:1}
@@ -65,7 +74,14 @@
   footer{border-top:1px solid var(--line);padding:26px 28px;color:var(--dimmer);font:12.5px var(--mono);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
   footer a{color:var(--dim);text-decoration:none} footer a:hover{color:var(--text)}
   @media (max-width:900px){.grid{grid-template-columns:1fr 1fr}nav a:not(.btn){display:none}}
-  @media (max-width:640px){.grid{grid-template-columns:1fr}}
+  @media (max-width:640px){
+    .grid{grid-template-columns:1fr}
+    .step{min-width:0}
+    h1{padding-top:48px}
+    .lead{font-size:15px}
+    .badge{font-size:12px;color:var(--dim)}
+    footer{color:var(--dim)}
+  }
 </style>
 </head>
 <body>
@@ -86,42 +102,43 @@
   <div class="steps">
     <div class="step"><b>1</b><p><strong>Click Install</strong> on a pack below. TinyNotch opens and downloads the pack itself.</p></div>
     <div class="step"><b>2</b><p><strong>Turn “Base” off</strong> in the Tools tab to see the pack tools.</p></div>
+    <div class="step"><b>3</b><p><strong>No app running?</strong> Download the .json below and drop it into the packs folder.</p></div>
   </div>
 
   <div class="grid">
     <div class="pack">
-      <div class="pack-head"><span class="pack-name">System</span><span class="pack-count">15 tools</span></div>
+      <div class="pack-head"><span class="pack-title"><span class="pack-ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M9 9h6v6H9z"/></svg></span><span class="pack-name">System</span></span><span class="pack-count">15 tools</span></div>
       <div class="pack-desc">Processes, disk, network, power — the machine under the notch.</div>
       <div class="pack-cta"><a class="btn-install" href="tinynotch://install?pack=pack-system">Install</a><a class="btn-json" href="packs/pack-system.json" download>.json</a></div>
     </div>
     <div class="pack">
-      <div class="pack-head"><span class="pack-name">Media</span><span class="pack-count">16 tools</span></div>
+      <div class="pack-head"><span class="pack-title"><span class="pack-ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></span><span class="pack-name">Media</span></span><span class="pack-count">16 tools</span></div>
       <div class="pack-desc">Converters, screenshots, audio and video helpers.</div>
       <div class="pack-cta"><a class="btn-install" href="tinynotch://install?pack=pack-media">Install</a><a class="btn-json" href="packs/pack-media.json" download>.json</a></div>
     </div>
     <div class="pack">
-      <div class="pack-head"><span class="pack-name">Code</span><span class="pack-count">10 tools</span></div>
+      <div class="pack-head"><span class="pack-title"><span class="pack-ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m8 8-4 4 4 4M16 8l4 4-4 4"/></svg></span><span class="pack-name">Code</span></span><span class="pack-count">10 tools</span></div>
       <div class="pack-desc">Formatters, hashes, base64, git helpers.</div>
       <div class="pack-cta"><a class="btn-install" href="tinynotch://install?pack=pack-code">Install</a><a class="btn-json" href="packs/pack-code.json" download>.json</a></div>
     </div>
     <div class="pack">
-      <div class="pack-head"><span class="pack-name">Info</span><span class="pack-count">10 tools</span></div>
+      <div class="pack-head"><span class="pack-title"><span class="pack-ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8v.01"/></svg></span><span class="pack-name">Info</span></span><span class="pack-count">10 tools</span></div>
       <div class="pack-desc">Lookups, units, encodings, quick reference.</div>
       <div class="pack-cta"><a class="btn-install" href="tinynotch://install?pack=pack-info">Install</a><a class="btn-json" href="packs/pack-info.json" download>.json</a></div>
     </div>
     <div class="pack">
-      <div class="pack-head"><span class="pack-name">Time</span><span class="pack-count">11 tools</span></div>
+      <div class="pack-head"><span class="pack-title"><span class="pack-ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><span class="pack-name">Time</span></span><span class="pack-count">11 tools</span></div>
       <div class="pack-desc">Timers, timezones, countdowns, epoch math.</div>
       <div class="pack-cta"><a class="btn-install" href="tinynotch://install?pack=pack-time">Install</a><a class="btn-json" href="packs/pack-time.json" download>.json</a></div>
     </div>
     <div class="pack">
-      <div class="pack-head"><span class="pack-name">Games</span><span class="pack-count">10 tools</span></div>
+      <div class="pack-head"><span class="pack-title"><span class="pack-ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 12h4M8 10v4M15 11h.01M18 13h.01"/><rect x="2" y="6" width="20" height="12" rx="5"/></svg></span><span class="pack-name">Games</span></span><span class="pack-count">10 tools</span></div>
       <div class="pack-desc">Small distractions for the five-minute break.</div>
       <div class="pack-cta"><a class="btn-install" href="tinynotch://install?pack=pack-games">Install</a><a class="btn-json" href="packs/pack-games.json" download>.json</a></div>
     </div>
   </div>
 
-  <div class="note">no Xcode needed — install works with any TinyNotch build</div>
+  <div class="note">Install opens the app when it’s running — otherwise the .json is one click away. No Xcode needed.</div>
 </div>
 <footer>
   <div>© 2026 TinyNotch · MIT</div>
