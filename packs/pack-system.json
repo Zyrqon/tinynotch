@@ -1,0 +1,23 @@
+{
+  "id": "pack-system",
+  "name": "Система",
+  "version": "1.0.0",
+  "author": "Zyrqon",
+  "tools": [
+    "sysMonitors",
+    "diskSpace",
+    "batteryInfo",
+    "uptimeInfo",
+    "publicIP",
+    "pingHost",
+    "speedTest",
+    "folderSize",
+    "bigFiles",
+    "emptyTrash",
+    "caffeinate",
+    "themeToggle",
+    "dndToggle",
+    "killProcess",
+    "wifiList"
+  ]
+}

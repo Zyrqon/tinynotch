@@ -1,0 +1,18 @@
+{
+  "id": "pack-code",
+  "name": "Код",
+  "version": "1.0.0",
+  "author": "Zyrqon",
+  "tools": [
+    "gitStatus",
+    "gitLog",
+    "todoCount",
+    "openEditor",
+    "localServer",
+    "portWho",
+    "ngrokTunnel",
+    "sqlSelect",
+    "sqlFormat",
+    "cronExplain"
+  ]
+}
