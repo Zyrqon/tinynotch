@@ -56,6 +56,10 @@ struct IslandRootView: View {
                 .frame(width: model.windowSize.width,
                        height: max(model.windowSize.height, model.notchSize.height + model.expandedContentHeightLive),
                        alignment: .top)
+                // Высоту холста не анимируем никогда: вкладка «Инструменты» меняет её,
+                // и анимированная перекладка всего холста каждый кадр дёргала вкладки.
+                // Анимируется только чёрная фигура-маска снаружи.
+                .animation(nil, value: model.windowSize.height)
                 .mask(alignment: .top) {
                     shape.frame(width: size.width, height: size.height)
                 }
