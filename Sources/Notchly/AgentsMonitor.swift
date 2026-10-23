@@ -188,6 +188,7 @@ final class AgentsStore: ObservableObject {
               let rows = (try? JSONSerialization.jsonObject(with: data)) as? [[String: Any]] else { return nil }
 
         let procs = agentProcesses().filter { $0.kind == .opencode }
+        let plugin = pluginStatuses()
         var result: [AgentSession] = []
         for row in rows {
             let id = row["id"] as? String ?? UUID().uuidString
@@ -198,10 +199,12 @@ final class AgentsStore: ObservableObject {
             let updated = Date(timeIntervalSince1970: updatedMs / 1000)
             let age = -updated.timeIntervalSinceNow
             guard age >= 0, age < 7 * 24 * 3600 else { continue } // сессии за последнюю неделю
-            let state: AgentSession.State
+            var state: AgentSession.State
             if pending > 0 { state = .waiting }
             else if age < 45 { state = .working }
             else { state = .idle }
+            // Точный статус от плагина opencode перекрывает эвристику (файл свежее 2 минут).
+            if let fresh = plugin[id] { state = fresh }
             var title = row["title"] as? String ?? ""
             if title.isEmpty || title == "New session" { title = "opencode" }
             if title.count > 46 { title = String(title.prefix(46)) }
@@ -213,6 +216,24 @@ final class AgentsStore: ObservableObject {
             result.append(s)
         }
         return result
+    }
+
+    /// Точные статусы от плагина opencode: notch.json рядом с базой.
+    /// Плагин сам сообщает working/waiting/idle по событиям, остров больше не угадывает.
+    private func pluginStatuses() -> [String: AgentSession.State] {
+        let url = openCodeDir.appendingPathComponent("notch.json")
+        guard let data = try? Data(contentsOf: url),
+              let root = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let map = root["sessions"] as? [String: Any] else { return [:] }
+        var out: [String: AgentSession.State] = [:]
+        for (id, raw) in map {
+            guard let info = raw as? [String: Any],
+                  let status = info["status"] as? String,
+                  let ts = (info["ts"] as? NSNumber)?.doubleValue else { continue }
+            guard -Date(timeIntervalSince1970: ts / 1000).timeIntervalSinceNow < 120 else { continue }
+            out[id] = status == "waiting" ? .waiting : (status == "working" ? .working : .idle)
+        }
+        return out
     }
 
     // MARK: - Процессы агентов и их терминалы
