@@ -343,6 +343,49 @@ private struct ReminderEvent: View {
     }
 }
 
+// MARK: - Зелёная галочка агента: круг по кругу, как разблокировка Mac
+
+/// Иконка «задача выполнена»: белое кольцо прочерчивается по часовой стрелке
+/// (заполняется только обод, внутри пусто), затем внутри прорисовывается галочка.
+private struct AgentDoneMark: View {
+    var color: Color
+    @ViewState private var ring: CGFloat = 0
+    @ViewState private var check: CGFloat = 0
+    @ViewState private var filled = false
+
+    var body: some View {
+        ZStack {
+            Circle()
+                .fill(color.opacity(filled ? 1 : 0.5).gradient)
+            Circle()
+                .trim(from: 0, to: ring)
+                .stroke(.white, style: StrokeStyle(lineWidth: 2.5, lineCap: .round))
+                .rotationEffect(.degrees(-90))
+            CheckShape()
+                .trim(from: 0, to: check)
+                .stroke(.white, style: StrokeStyle(lineWidth: 2.6, lineCap: .round, lineJoin: .round))
+                .padding(12)
+        }
+        .frame(width: 40, height: 40)
+        .onAppear {
+            withAnimation(.easeInOut(duration: 0.5)) { ring = 1 }
+            withAnimation(.easeOut(duration: 0.3).delay(0.55)) { check = 1 }
+            withAnimation(.easeInOut(duration: 0.35).delay(0.6)) { filled = true }
+        }
+    }
+}
+
+/// Контур галочки в normalized-координатах своего прямоугольника.
+private struct CheckShape: Shape {
+    func path(in rect: CGRect) -> Path {
+        var p = Path()
+        p.move(to: CGPoint(x: rect.minX, y: rect.midY + rect.height * 0.08))
+        p.addLine(to: CGPoint(x: rect.minX + rect.width * 0.3, y: rect.maxY - rect.height * 0.08))
+        p.addLine(to: CGPoint(x: rect.maxX, y: rect.minY + rect.height * 0.1))
+        return p
+    }
+}
+
 // MARK: - Уведомление
 
 private struct NotificationEvent: View {
@@ -379,10 +422,14 @@ private struct NotificationEvent: View {
     private var icon: some View {
         Group {
             if item.bundleID == "ru.iabrik.agents" {
-                Image(systemName: item.body == L("Задача выполнена") ? "checkmark.seal.fill" : "cpu.fill")
-                    .font(.system(size: 17, weight: .semibold))
-                    .foregroundStyle(.white)
-                    .background(RoundedRectangle(cornerRadius: 10, style: .continuous).fill(agentColor.gradient))
+                if item.body == L("Задача выполнена") {
+                    AgentDoneMark(color: agentColor)
+                } else {
+                    Image(systemName: "cpu.fill")
+                        .font(.system(size: 17, weight: .semibold))
+                        .foregroundStyle(.white)
+                        .background(RoundedRectangle(cornerRadius: 10, style: .continuous).fill(agentColor.gradient))
+                }
             } else if item.bundleID == AppNotification.gmailID {
                 Image(systemName: "envelope.fill")
                     .font(.system(size: 18, weight: .semibold))
