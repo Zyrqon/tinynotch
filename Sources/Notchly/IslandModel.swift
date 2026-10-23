@@ -195,6 +195,20 @@ final class IslandModel: ObservableObject {
     var eventHovered = false
     @Published var notchSize = CGSize(width: 200, height: 32)
     @Published var hasPhysicalNotch = true
+    /// Насколько окно «Инструментов» вытянуто вниз за ручку, в пунктах. 0 = стандартная высота.
+    @Published var toolsExtra: CGFloat = {
+        let raw = UserDefaults.standard.double(forKey: "island.toolsExtra")
+        return raw <= 0 ? 0 : min(420, CGFloat(raw))
+    }() {
+        didSet { UserDefaults.standard.set(Double(toolsExtra), forKey: "island.toolsExtra") }
+    }
+    /// Размер холста окна: в раскрытых инструментах — вытянутый вниз, иначе стандартный.
+    var windowSize: CGSize {
+        tab == .tools && isExpanded
+            ? CGSize(width: IslandMetrics.windowSize.width,
+                     height: IslandMetrics.windowSize.height + toolsExtra)
+            : IslandMetrics.windowSize
+    }
 
     let media = MediaController()
     let volume = VolumeController()
@@ -261,6 +275,7 @@ final class IslandModel: ObservableObject {
         weather = WeatherService(live: persistent)
         alarms = AlarmStore(persistent: persistent)
         tab = IslandTab(rawValue: UserDefaults.standard.string(forKey: "island.tab") ?? "") ?? .home
+        if tab == .notifications { tab = .home }  // раздел уведомлений пока убран
         agents.onApproval = { [weak self] title in self?.showAgentApproval(title) }
         agents.onFinish = { [weak self] title in self?.showAgentFinished(title) }
         agents.start()
@@ -465,7 +480,12 @@ final class IslandModel: ObservableObject {
     /// Полный размер фигуры с учётом изгибов у верхней кромки.
     var shapeSize: CGSize {
         if let debugFrame { return debugFrame.size }
-        return CGSize(width: bodySize.width + topRadius * 2, height: bodySize.height)
+        let base = CGSize(width: bodySize.width + topRadius * 2, height: bodySize.height)
+        // В инструментах окно тянут за уголок: форма острова растёт вместе с холстом.
+        if tab == .tools, isExpanded, toolsExtra > 0 {
+            return CGSize(width: base.width, height: base.height + toolsExtra)
+        }
+        return base
     }
 
     /// Живая активность музыки в свёрнутом острове (можно выключить в настройках).

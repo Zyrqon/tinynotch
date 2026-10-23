@@ -53,8 +53,8 @@ struct IslandRootView: View {
             content
                 // Смена языка пересобирает содержимое целиком — все строки берутся заново.
                 .id(model.settings.language)
-                .frame(width: IslandMetrics.windowSize.width,
-                       height: max(IslandMetrics.windowSize.height, model.notchSize.height + model.expandedContentHeightLive),
+                .frame(width: model.windowSize.width,
+                       height: max(model.windowSize.height, model.notchSize.height + model.expandedContentHeightLive),
                        alignment: .top)
                 .mask(alignment: .top) {
                     shape.frame(width: size.width, height: size.height)
@@ -66,7 +66,7 @@ struct IslandRootView: View {
                 .allowsHitTesting(false)
             // attn LED: пульсирующая точка у края выреза, пока агент ждёт подтверждения.
             if model.agents.waitingCount > 0 {
-                AttentionLED(inset: IslandMetrics.windowSize.width / 2 - model.notchSize.width / 2 - 14)
+                AttentionLED(inset: model.windowSize.width / 2 - model.notchSize.width / 2 - 14)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)

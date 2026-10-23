@@ -68,9 +68,6 @@ struct ExpandedIslandView: View {
                         select(model.tab == tab ? .home : tab)
                     }
                 }
-                NotificationBell(model: model, gmail: model.gmail, system: model.systemNotifications) {
-                    select(model.tab == .notifications ? .home : .notifications)
-                }
             }
             .frame(width: side, alignment: .leading)
         }

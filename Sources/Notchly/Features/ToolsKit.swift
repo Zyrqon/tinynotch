@@ -118,7 +118,204 @@ struct ToolsTabView: View {
                 toolsList
             }
         }
-        .padding(12)
+        .padding(10)
+        .safeAreaInset(edge: .bottom, spacing: 0) { resizeGrip.padding(.top, 4).padding(.bottom, 3) }
+        .animation(.smooth(duration: 0.28), value: selected)
+        .animation(.smooth(duration: 0.2), value: activeCategory)
+    }
+
+    @ViewState private var gripHovered = false
+    @ViewState private var resizing = false
+    @ViewState private var extraAtDragStart: CGFloat = 0
+
+    /// Серая полоска внизу острова: тянешь вниз — окно вытягивается, вверх — сжимается обратно.
+    private var resizeGrip: some View {
+        RoundedRectangle(cornerRadius: 2.5, style: .continuous)
+            .fill(Color.white.opacity(gripHovered || resizing ? 0.55 : 0.25))
+            .frame(width: 130, height: 5)
+            .contentShape(Rectangle().inset(by: -8))
+            .onHover { gripHovered = $0 }
+            .gesture(
+                DragGesture(minimumDistance: 1)
+                    .onChanged { value in
+                        if !resizing {
+                            resizing = true
+                            extraAtDragStart = model.toolsExtra
+                        }
+                        model.toolsExtra = min(420, max(0, extraAtDragStart + value.translation.height))
+                    }
+                    .onEnded { _ in resizing = false }
+            )
+    }
+
+    @ViewBuilder
+    private func statusBadge(_ tool: ToolID) -> some View {
+        let locked = packs.baseOnly && !packs.isEnabled(tool)
+        if locked {
+            label(L("пак"), Color.orange)
+        } else if tool.implemented {
+            label(L("готово"), Color.green)
+        } else {
+            label(L("скоро"), Color.secondary)
+        }
+    }
+
+    private func label(_ text: String, _ color: Color) -> some View {
+        Text(text)
+            .font(.system(size: 9.5, weight: .semibold))
+            .foregroundStyle(color)
+            .padding(.horizontal, 7).padding(.vertical, 3)
+            .background(color.opacity(0.13), in: Capsule())
+    }
+
+    private var searchBar: some View {
+        VStack(spacing: 5) {
+            HStack(spacing: 8) {
+                Image(systemName: "magnifyingglass")
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundStyle(.secondary)
+                TextField(L("Поиск инструмента"), text: $query)
+                    .textFieldStyle(.plain)
+                    .font(.system(size: 12.5))
+                Text("\(ToolImplementations.count)/\(ToolID.allCases.count)")
+                    .font(.system(size: 10, design: .monospaced).weight(.medium))
+                    .foregroundStyle(Color.teal)
+                    .padding(.horizontal, 7).padding(.vertical, 3)
+                    .background(Color.teal.opacity(0.12), in: Capsule())
+                Button {
+                    withAnimation(.smooth(duration: 0.45)) { packs.baseOnly.toggle() }
+                } label: {
+                    HStack(spacing: 4) {
+                        Image(systemName: packs.baseOnly ? "lock.fill" : "lock.open.fill")
+                            .font(.system(size: 9))
+                        Text(packs.baseOnly ? L("База") : L("Все"))
+                    }
+                    .font(.caption2.weight(.medium))
+                    .foregroundStyle(packs.baseOnly ? Color.orange : Color.teal)
+                    .padding(.horizontal, 8).padding(.vertical, 3)
+                    .background(packs.baseOnly ? Color.orange.opacity(0.13) : Color.teal.opacity(0.13), in: Capsule())
+                }
+                .buttonStyle(.plain)
+            }
+            GeometryReader { geo in
+                ZStack(alignment: .leading) {
+                    Capsule().fill(.quaternary)
+                    Capsule()
+                        .fill(LinearGradient(colors: [Color.teal, Color.mint],
+                                             startPoint: .leading, endPoint: .trailing))
+                        .frame(width: geo.size.width * progressFraction)
+                }
+            }
+            .frame(height: 2)
+        }
+        .padding(.horizontal, 8).padding(.vertical, 5)
+        .background(.quinary, in: RoundedRectangle(cornerRadius: 7))
+    }
+
+    @ViewState private var activeCategory: String? = nil
+
+    /// Сетка карточек с чипами категорий (стиль Atoll): крупные панели вместо списка.
+    @ViewBuilder private var toolsList: some View {
+        let q = query.trimmingCharacters(in: .whitespaces)
+        let list: [ToolID] = {
+            if !q.isEmpty { return ToolID.allCases.filter { matches($0, q) } }
+            if let cat = activeCategory { return ToolID.allCases.filter { $0.category == cat } }
+            return Array(ToolID.allCases)
+        }()
+        ScrollView {
+            VStack(alignment: .leading, spacing: 9) {
+                if q.isEmpty {
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 6) {
+                            chip(L("Все"), nil)
+                            ForEach(categories, id: \.self) { chip($0, $0) }
+                        }
+                        .padding(.horizontal, 2)
+                        .padding(.vertical, 2)
+                    }
+                }
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 118, maximum: 170), spacing: 8)],
+                          alignment: .leading, spacing: 8) {
+                    ForEach(list) { tool in
+                        toolCard(tool)
+                    }
+                }
+            }
+            .padding(.bottom, 8)
+        }
+    }
+
+    private func chip(_ title: String, _ category: String?) -> some View {
+        let a = category.map { accent(for: $0) }
+        let isSel = activeCategory == category
+        return Button {
+            withAnimation(.smooth(duration: 0.25)) { activeCategory = category }
+        } label: {
+            HStack(spacing: 4) {
+                if let a {
+                    Image(systemName: a.icon)
+                        .font(.system(size: 8.5, weight: .semibold))
+                }
+                Text(title).font(.system(size: 10.5, weight: .semibold))
+                if let category {
+                    Text("\(ToolID.allCases.filter { $0.category == category }.count)")
+                        .font(.system(size: 9, design: .monospaced))
+                        .opacity(0.65)
+                }
+            }
+            .padding(.horizontal, 9).padding(.vertical, 4)
+            .background(isSel ? (a?.color ?? Color.teal).opacity(0.22) : Color.white.opacity(0.06),
+                        in: Capsule())
+            .foregroundStyle(isSel ? (a?.color ?? Color.teal) : Color.white.opacity(0.6))
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func toolCard(_ tool: ToolID) -> some View {
+        let locked = packs.baseOnly && !packs.isEnabled(tool)
+        let a = accent(for: tool.category)
+        let dim = !tool.implemented && !locked
+        return Button { withAnimation(.smooth(duration: 0.25)) { selected = tool } } label: {
+            VStack(alignment: .leading, spacing: 8) {
+                HStack(spacing: 6) {
+                    Image(systemName: tool.icon)
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundStyle(locked ? Color.orange : (dim ? Color.secondary : a.color))
+                        .frame(width: 26, height: 26)
+                        .background(RoundedRectangle(cornerRadius: 8, style: .continuous)
+                            .fill(a.color.opacity(dim ? 0.08 : 0.16)))
+                    Spacer()
+                    if locked {
+                        Image(systemName: "lock.fill")
+                            .font(.system(size: 8.5, weight: .semibold))
+                            .foregroundStyle(Color.orange)
+                    } else if tool.implemented {
+                        Circle().fill(Color.green).frame(width: 5, height: 5)
+                    } else {
+                        Text(L("скоро"))
+                            .font(.system(size: 8.5, weight: .medium))
+                            .foregroundStyle(.tertiary)
+                    }
+                }
+                Text(tool.title)
+                    .font(.system(size: 11, weight: .medium))
+                    .lineLimit(2).multilineTextAlignment(.leading)
+                    .foregroundStyle(dim ? Color.secondary : Color.primary)
+                    .frame(maxWidth: .infinity, minHeight: 24, alignment: .topLeading)
+                Text(tool.category)
+                    .font(.system(size: 8.5, weight: .medium))
+                    .foregroundStyle(a.color.opacity(0.8))
+            }
+            .padding(9)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .fill(Color.white.opacity(hovered == tool ? 0.09 : 0.05)))
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .onHover { h in
+            if h { hovered = tool } else if hovered == tool { hovered = nil }
+        }
     }
 
     @ViewBuilder
@@ -460,6 +657,10 @@ struct ToolDetailView: View {
         case .colorPicker: ColorPickerTool()
         case .paletteImg: PaletteImgTool()
         case .screenRuler: ScreenRulerTool()
+        case .dupFinder: DupFinderTool()
+        case .dnsWho: DnsWhoTool()
+        case .remindLater: RemindLaterTool()
+        case .imgShrink: ImgShrinkTool()
         default: ToolComingView(tool: tool)
         }
     }

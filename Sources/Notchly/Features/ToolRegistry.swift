@@ -102,7 +102,11 @@ enum ToolID: String, CaseIterable, Identifiable {
     hotkeyCheat,
     sizeConvert,
     tzConvert,
-    pasteClean
+    pasteClean,
+    dupFinder,
+    dnsWho,
+    remindLater,
+    imgShrink
 
     var id: String { rawValue }
 
@@ -211,6 +215,10 @@ enum ToolID: String, CaseIterable, Identifiable {
         case .sizeConvert: return L("Размеры одежды")
         case .tzConvert: return L("Часовые пояса")
         case .pasteClean: return L("Умная вставка")
+        case .dupFinder: return L("Дубликаты файлов")
+        case .dnsWho: return L("Сеть: DNS и whois")
+        case .remindLater: return L("Напомни через N")
+        case .imgShrink: return L("Сжать картинки")
         }
     }
 
@@ -316,6 +324,10 @@ enum ToolID: String, CaseIterable, Identifiable {
         case .sizeConvert: return "tshirt"
         case .tzConvert: return "globe.asia.australia.fill"
         case .pasteClean: return "clipboard"
+        case .dupFinder: return "doc.on.doc"
+        case .dnsWho: return "network"
+        case .remindLater: return "bell.badge.fill"
+        case .imgShrink: return "arrow.down.right.and.arrow.up.left"
         }
     }
 
@@ -421,6 +433,10 @@ enum ToolID: String, CaseIterable, Identifiable {
         case .sizeConvert: return "Игры"
         case .tzConvert: return "Игры"
         case .pasteClean: return "Игры"
+        case .dupFinder: return "Система"
+        case .dnsWho: return "Система"
+        case .remindLater: return "Время"
+        case .imgShrink: return "Медиа"
         }
     }
 
@@ -449,6 +465,7 @@ let ToolImplementations: Set<ToolID> = [
     .stretchReminder, .waterCounter, .breathe, .quoteOfDay, .jokeOfDay,
     .game2048, .snake, .mines, .tamagotchi, .siteBlocker,
     .pomodoroStats, .hotkeyCheat, .sizeConvert, .tzConvert, .pasteClean,
+    .dupFinder, .dnsWho, .remindLater, .imgShrink,
 ]
 struct ToolComingView: View {
     let tool: ToolID

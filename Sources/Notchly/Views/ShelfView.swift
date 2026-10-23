@@ -1,4 +1,6 @@
 import SwiftUI
+import AppKit
+import UniformTypeIdentifiers
 import QuickLookThumbnailing
 
 struct ShelfView: View {
@@ -6,22 +8,7 @@ struct ShelfView: View {
     var isTargeted: Bool
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Text(store.items.isEmpty ? L("Файлы") : L("Файлы · %@", "\(store.items.count)"))
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(.white.opacity(0.6))
-                    .contentTransition(.numericText())
-                Spacer()
-                if !store.items.isEmpty {
-                    Button(L("Очистить")) { store.removeAll() }
-                        .buttonStyle(.plain)
-                        .font(.system(size: 11.5, weight: .medium))
-                        .foregroundStyle(.white.opacity(0.55))
-                        .transition(.opacity)
-                }
-            }
-
+        HStack(alignment: .top, spacing: 10) {
             ZStack {
                 // Пунктирная рамка нужна, только когда полка пустая или над ней тянут файл.
                 // С файлами фон остаётся чистым — без «плёнки» поверх иконок.
@@ -39,7 +26,7 @@ struct ShelfView: View {
                             .font(.system(size: 24, weight: .medium))
                             .contentTransition(.symbolEffect(.replace))
                             .symbolEffect(.bounce, value: isTargeted)
-                        Text(L("Перетащите файлы сюда, чтобы подержать их под рукой"))
+                        Text(L("Перетащи файлы на полку"))
                             .font(.system(size: 11.5))
                     }
                     .foregroundStyle(.white.opacity(0.5))
@@ -56,7 +43,88 @@ struct ShelfView: View {
                     }
                 }
             }
+            .frame(maxWidth: .infinity)
+            .frame(height: 126)
+            .overlay(alignment: .bottomLeading) {
+                Text(store.items.isEmpty ? L("Файлы") : L("Файлы · %@", "\(store.items.count)"))
+                    .font(.system(size: 11.5, weight: .semibold))
+                    .foregroundStyle(.white.opacity(0.7))
+                    .padding(.leading, 14)
+                    .padding(.bottom, 10)
+                    .contentTransition(.numericText())
+            }
+            .overlay(alignment: .topTrailing) {
+                if !store.items.isEmpty {
+                    Button(L("Очистить")) { store.removeAll() }
+                        .buttonStyle(.plain)
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundStyle(.white.opacity(0.55))
+                        .padding(.top, 8)
+                        .padding(.trailing, 10)
+                        .transition(.opacity)
+                }
+            }
+
+            ShelfAirDropPane(isTargeted: isTargeted)
         }
+    }
+}
+
+private struct ShelfAirDropPane: View {
+    var isTargeted: Bool
+    @ViewState private var status = ""
+    @ViewState private var dropActive = false
+
+    var body: some View {
+        ZStack(alignment: .topLeading) {
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .fill(.white.opacity(dropActive || isTargeted ? 0.1 : 0.05))
+
+            VStack(alignment: .leading, spacing: 0) {
+                Image(systemName: "dot.radiowaves.left.and.right")
+                    .font(.system(size: 20, weight: .medium))
+                    .foregroundStyle(.white.opacity(0.75))
+                    .symbolEffect(.bounce, value: dropActive)
+                    .padding(.leading, 14)
+                    .padding(.top, 14)
+                Spacer()
+                Text(status.isEmpty ? L("AirDrop") : status)
+                    .font(.system(size: 11.5, weight: .semibold))
+                    .foregroundStyle(.white.opacity(0.75))
+                    .lineLimit(2)
+                    .contentTransition(.opacity)
+                    .padding(.leading, 14)
+                    .padding(.bottom, 10)
+            }
+            .frame(maxHeight: .infinity, alignment: .top)
+        }
+        .frame(maxWidth: .infinity)
+        .frame(height: 126)
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .onDrop(of: [.fileURL], isTargeted: Binding(get: { dropActive }, set: { dropActive = $0 })) { providers in
+            var urls: [URL] = []
+            let group = DispatchGroup()
+            for provider in providers {
+                group.enter()
+                _ = provider.loadObject(ofClass: URL.self) { url, _ in
+                    if let url { urls.append(url) }
+                    group.leave()
+                }
+            }
+            group.notify(queue: .main) { if !urls.isEmpty { send(urls) } }
+            return true
+        }
+    }
+
+    private func send(_ urls: [URL]) {
+        guard let service = NSSharingService(named: .sendViaAirDrop), service.canPerform(withItems: urls) else {
+            status = L("AirDrop недоступен")
+            return
+        }
+        status = L("Отправка: \(urls.count) файл(ов)")
+        NSApp.activate(ignoringOtherApps: true)
+        service.perform(withItems: urls)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) { status = "" }
     }
 }
 

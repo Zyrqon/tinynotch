@@ -107,7 +107,7 @@ final class NotchWindowController {
             model.hasPhysicalNotch = false
         }
 
-        let size = IslandMetrics.windowSize
+        let size = model.windowSize
         let frame = NSRect(x: screen.frame.midX - size.width / 2,
                            y: screen.frame.maxY - size.height,
                            width: size.width, height: size.height)
@@ -116,11 +116,11 @@ final class NotchWindowController {
 
     /// Окно не меньше острова: высоту тянем вниз, верхняя кромка неподвижна.
     private func syncPanelFrame() {
-        let needed = max(CGFloat(IslandMetrics.windowSize.height), model.shapeSize.height + 24)
+        let needed = max(model.windowSize.height, model.shapeSize.height + 24)
         guard abs(needed - panel.frame.height) > 0.5 else { return }
-        let frame = NSRect(x: screen.frame.midX - IslandMetrics.windowSize.width / 2,
+        let frame = NSRect(x: screen.frame.midX - model.windowSize.width / 2,
                            y: screen.frame.maxY - needed,
-                           width: IslandMetrics.windowSize.width, height: needed)
+                           width: model.windowSize.width, height: needed)
         panel.setFrame(frame, display: true)
     }
 
