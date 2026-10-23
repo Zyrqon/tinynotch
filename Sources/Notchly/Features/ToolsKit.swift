@@ -140,12 +140,11 @@ struct ToolsTabView: View {
                     .onChanged { value in
                         if !resizing {
                             resizing = true
-                            model.isResizingTools = true
                             extraAtDragStart = model.toolsExtra
                         }
                         model.toolsExtra = min(420, max(0, extraAtDragStart + value.translation.height))
                     }
-                    .onEnded { _ in resizing = false; model.isResizingTools = false }
+                    .onEnded { _ in resizing = false }
             )
     }
 

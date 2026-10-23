@@ -117,16 +117,21 @@ final class NotchWindowController {
     /// Окно не меньше острова: высоту тянем вниз, верхняя кромка неподвижна.
     /// Во время тяги за полоску — мгновенно, иначе плавно, в такт анимации фигуры.
     private func syncPanelFrame() {
-        let needed = max(model.windowSize.height, model.shapeSize.height + 24)
+        // При раскрытом острове окно всегда максимально большое и ставится мгновенно:
+        // окно нельзя анимировать, пока остров раскрыт, иначе холст содержимого едет
+        // каждый кадр и вкладки дёргаются. Едет только сам остров внутри окна.
+        let needed = model.isExpanded
+            ? max(model.maxWindowHeight, model.shapeSize.height + 24)
+            : max(model.windowSize.height, model.shapeSize.height + 24)
         guard abs(needed - panel.frame.height) > 0.5 else { return }
         let frame = NSRect(x: screen.frame.midX - model.windowSize.width / 2,
                            y: screen.frame.maxY - needed,
                            width: model.windowSize.width, height: needed)
-        if model.isResizingTools {
+        if model.isExpanded {
             panel.setFrame(frame, display: true)
         } else {
             NSAnimationContext.runAnimationGroup { ctx in
-                ctx.duration = 0.3
+                ctx.duration = 0.25
                 ctx.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
                 ctx.allowsImplicitAnimation = true
                 panel.setFrame(frame, display: true)
