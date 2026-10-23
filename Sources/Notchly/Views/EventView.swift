@@ -351,26 +351,25 @@ private struct AgentDoneMark: View {
     var color: Color
     @ViewState private var ring: CGFloat = 0
     @ViewState private var check: CGFloat = 0
-    @ViewState private var filled = false
 
     var body: some View {
         ZStack {
             Circle()
-                .fill(color.opacity(filled ? 1 : 0.5).gradient)
+                .fill(color.gradient)
             Circle()
                 .trim(from: 0, to: ring)
-                .stroke(.white, style: StrokeStyle(lineWidth: 2.5, lineCap: .round))
+                .stroke(.white.opacity(0.95), style: StrokeStyle(lineWidth: 2.2, lineCap: .round))
+                .padding(3)
                 .rotationEffect(.degrees(-90))
             CheckShape()
                 .trim(from: 0, to: check)
-                .stroke(.white, style: StrokeStyle(lineWidth: 2.6, lineCap: .round, lineJoin: .round))
-                .padding(12)
+                .stroke(.white, style: StrokeStyle(lineWidth: 2.4, lineCap: .round, lineJoin: .round))
+                .padding(13)
         }
         .frame(width: 40, height: 40)
         .onAppear {
-            withAnimation(.easeInOut(duration: 0.5)) { ring = 1 }
-            withAnimation(.easeOut(duration: 0.3).delay(0.55)) { check = 1 }
-            withAnimation(.easeInOut(duration: 0.35).delay(0.6)) { filled = true }
+            withAnimation(.easeInOut(duration: 0.45).delay(0.3)) { ring = 1 }
+            withAnimation(.easeOut(duration: 0.25).delay(0.75)) { check = 1 }
         }
     }
 }
