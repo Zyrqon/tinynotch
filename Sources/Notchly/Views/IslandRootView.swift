@@ -40,6 +40,10 @@ struct IslandRootView: View {
     var body: some View {
         let shape = NotchShape(topRadius: model.topRadius, bottomRadius: model.bottomRadius)
         let size = model.shapeSize
+        // Высоту меняет только вкладка «Инструменты». Раньше окно и чёрная фигура анимировались
+        // разными кривыми и рассинхронизировались: остров дёргался. Теперь фигура и окно едут
+        // одним прямым easing 0.3 с, а во время тяги полоски анимации выключены вовсе.
+        let toolsEase: Animation? = model.isResizingTools ? nil : .easeInOut(duration: 0.3)
         // Содержимое лежит на неподвижном холсте размером с окно, по центру, и никогда не меняет раскладку.
         // Анимируется только чёрная форма, которая его обрезает. Поэтому при сворачивании и при исчезновении
         // HUD ничто не «уезжает» вбок: удаляемые виды SwiftUI привязывает к краю родителя, а родитель неподвижен.
@@ -50,6 +54,7 @@ struct IslandRootView: View {
                 .fill(settings.islandBackground)
                 .frame(width: size.width, height: size.height)
                 .shadow(color: .black.opacity(model.isExpanded || model.event != nil ? 0.5 : 0), radius: 16, y: 6)
+                .animation(toolsEase, value: model.tab)
             content
                 // Смена языка пересобирает содержимое целиком — все строки берутся заново.
                 .id(model.settings.language)
@@ -58,12 +63,14 @@ struct IslandRootView: View {
                        alignment: .top)
                 .mask(alignment: .top) {
                     shape.frame(width: size.width, height: size.height)
+                        .animation(toolsEase, value: model.tab)
                 }
             // Подсветка краёв при перетаскивании файла.
             shape
                 .stroke(Color.white.opacity(model.isDropTargeted ? 0.35 : 0), lineWidth: 1.5)
                 .frame(width: size.width, height: size.height)
                 .allowsHitTesting(false)
+                .animation(toolsEase, value: model.tab)
             // attn LED: пульсирующая точка у края выреза, пока агент ждёт подтверждения.
             if model.agents.waitingCount > 0 {
                 AttentionLED(inset: model.windowSize.width / 2 - model.notchSize.width / 2 - 14)

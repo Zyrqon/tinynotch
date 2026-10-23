@@ -140,11 +140,12 @@ struct ToolsTabView: View {
                     .onChanged { value in
                         if !resizing {
                             resizing = true
+                            model.isResizingTools = true
                             extraAtDragStart = model.toolsExtra
                         }
                         model.toolsExtra = min(420, max(0, extraAtDragStart + value.translation.height))
                     }
-                    .onEnded { _ in resizing = false }
+                    .onEnded { _ in resizing = false; model.isResizingTools = false }
             )
     }
 
@@ -315,177 +316,6 @@ struct ToolsTabView: View {
         .buttonStyle(.plain)
         .onHover { h in
             if h { hovered = tool } else if hovered == tool { hovered = nil }
-        }
-    }
-
-    @ViewBuilder
-    private func statusBadge(_ tool: ToolID) -> some View {
-        let locked = packs.baseOnly && !packs.isEnabled(tool)
-        if locked {
-            label(L("пак"), Color.orange)
-        } else if tool.implemented {
-            label(L("готово"), Color.green)
-        } else {
-            label(L("скоро"), Color.secondary)
-        }
-    }
-
-    private func label(_ text: String, _ color: Color) -> some View {
-        Text(text)
-            .font(.system(size: 9.5, weight: .semibold))
-            .foregroundStyle(color)
-            .padding(.horizontal, 7).padding(.vertical, 3)
-            .background(color.opacity(0.13), in: Capsule())
-    }
-
-    private var searchBar: some View {
-        VStack(spacing: 7) {
-            HStack(spacing: 8) {
-                Image(systemName: "magnifyingglass")
-                    .font(.system(size: 11, weight: .medium))
-                    .foregroundStyle(.secondary)
-                TextField(L("Поиск инструмента"), text: $query)
-                    .textFieldStyle(.plain)
-                    .font(.system(size: 12.5))
-                Text("\(ToolImplementations.count)/\(ToolID.allCases.count)")
-                    .font(.system(size: 10, design: .monospaced).weight(.medium))
-                    .foregroundStyle(Color.teal)
-                    .padding(.horizontal, 7).padding(.vertical, 3)
-                    .background(Color.teal.opacity(0.12), in: Capsule())
-                Button {
-                    withAnimation(.smooth(duration: 0.45)) { packs.baseOnly.toggle() }
-                } label: {
-                    HStack(spacing: 4) {
-                        Image(systemName: packs.baseOnly ? "lock.fill" : "lock.open.fill")
-                            .font(.system(size: 9))
-                        Text(packs.baseOnly ? L("База") : L("Все"))
-                    }
-                    .font(.caption2.weight(.medium))
-                    .foregroundStyle(packs.baseOnly ? Color.orange : Color.teal)
-                    .padding(.horizontal, 8).padding(.vertical, 3)
-                    .background(packs.baseOnly ? Color.orange.opacity(0.13) : Color.teal.opacity(0.13), in: Capsule())
-                }
-                .buttonStyle(.plain)
-            }
-            GeometryReader { geo in
-                ZStack(alignment: .leading) {
-                    Capsule().fill(.quaternary)
-                    Capsule()
-                        .fill(LinearGradient(colors: [Color.teal, Color.mint],
-                                             startPoint: .leading, endPoint: .trailing))
-                        .frame(width: geo.size.width * progressFraction)
-                }
-            }
-            .frame(height: 3)
-        }
-        .padding(.horizontal, 10).padding(.vertical, 8)
-        .background(.quinary, in: RoundedRectangle(cornerRadius: 10))
-    }
-
-    @ViewBuilder private var toolsList: some View {
-        let q = query.trimmingCharacters(in: .whitespaces)
-        if q.isEmpty {
-            ScrollView {
-                VStack(spacing: 5) {
-                    ForEach(categories, id: \.self) { cat in
-                        categoryPanel(cat)
-                    }
-                }
-                .padding(.bottom, 6)
-            }
-        } else {
-            ScrollView {
-                VStack(spacing: 2) {
-                    ForEach(ToolID.allCases.filter { matches($0, q) }) { tool in
-                        toolRow(tool)
-                    }
-                }
-                .padding(.bottom, 6)
-            }
-        }
-    }
-
-    private func categoryPanel(_ category: String) -> some View {
-        let tools = ToolID.allCases.filter { $0.category == category }
-        let isOpen = expanded.contains(category)
-        let a = accent(for: category)
-        return VStack(spacing: 0) {
-            Button {
-                withAnimation(.smooth(duration: 0.3)) {
-                    if isOpen { expanded.remove(category) } else { expanded.insert(category) }
-                }
-            } label: {
-                HStack(spacing: 8) {
-                    Image(systemName: a.icon)
-                        .font(.system(size: 10, weight: .semibold))
-                        .foregroundStyle(a.color)
-                        .frame(width: 22, height: 22)
-                        .background(a.color.opacity(0.15), in: RoundedRectangle(cornerRadius: 6))
-                    Text(category).font(.system(size: 12, weight: .semibold))
-                    Spacer()
-                    Text("\(tools.count)")
-                        .font(.system(size: 10, design: .monospaced).weight(.medium))
-                        .foregroundStyle(a.color)
-                        .padding(.horizontal, 6).padding(.vertical, 2)
-                        .background(a.color.opacity(0.12), in: Capsule())
-                    Image(systemName: "chevron.right")
-                        .font(.system(size: 9, weight: .semibold))
-                        .rotationEffect(.degrees(isOpen ? 90 : 0))
-                        .foregroundStyle(.tertiary)
-                }
-                .padding(.horizontal, 10).padding(.vertical, 8)
-                .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-            .background(.quinary, in: RoundedRectangle(cornerRadius: 10))
-            if isOpen {
-                VStack(spacing: 2) {
-                    ForEach(tools) { tool in
-                        toolRow(tool)
-                    }
-                }
-                .padding(.top, 3)
-                .transition(.opacity)
-            }
-        }
-    }
-
-    private func toolRow(_ tool: ToolID) -> some View {
-        let locked = packs.baseOnly && !packs.isEnabled(tool)
-        let a = accent(for: tool.category)
-        return Button { withAnimation(.smooth(duration: 0.25)) { selected = tool } } label: {
-            HStack(spacing: 8) {
-                Image(systemName: tool.icon)
-                    .font(.system(size: 11, weight: .medium))
-                    .foregroundStyle(locked ? Color.orange : (tool.implemented ? a.color : Color.secondary.opacity(0.55)))
-                    .frame(width: 16)
-                Text(tool.title)
-                    .font(.system(size: 12))
-                    .lineLimit(1)
-                Spacer()
-                if locked {
-                    Image(systemName: "lock.fill").font(.system(size: 9, weight: .semibold)).foregroundStyle(Color.orange)
-                } else if tool.implemented {
-                    Circle().fill(Color.green).frame(width: 5, height: 5)
-                } else {
-                    Text(L("скоро"))
-                        .font(.system(size: 9, weight: .medium))
-                        .foregroundStyle(.tertiary)
-                        .padding(.horizontal, 5).padding(.vertical, 1)
-                        .background(.quaternary, in: Capsule())
-                }
-                Text("#\(tool.number)")
-                    .font(.system(size: 9.5, design: .monospaced))
-                    .foregroundStyle(.tertiary)
-            }
-            .padding(.horizontal, 10).padding(.vertical, 6)
-            .background(hovered == tool ? Color.primary.opacity(0.07) : Color.clear,
-                        in: RoundedRectangle(cornerRadius: 8))
-            .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain)
-        .onHover { hovering in
-            if hovering { hovered = tool } else if hovered == tool { hovered = nil }
         }
     }
 }

@@ -203,6 +203,9 @@ final class IslandModel: ObservableObject {
         didSet { UserDefaults.standard.set(Double(toolsExtra), forKey: "island.toolsExtra") }
     }
     /// Размер холста окна: в раскрытых инструментах — вытянутый вниз, иначе стандартный.
+    /// Живая тяга полоски растяжки: во время неё окно двигается без анимации, один в один за пальцем.
+    var isResizingTools = false
+
     var windowSize: CGSize {
         tab == .tools && isExpanded
             ? CGSize(width: IslandMetrics.windowSize.width,
