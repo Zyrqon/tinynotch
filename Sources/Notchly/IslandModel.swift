@@ -445,6 +445,9 @@ final class IslandModel: ObservableObject {
         // чтобы над панелью не оставалась пустая полоса.
         if converter.isOpen { return 104 }
         if tab == .apps { return 280 }
+        // Инструменты: страница рассчитана на полную высоту окна (320 + тяга за полоску),
+        // поэтому остров в этой вкладке обязан быть выше стандартных 180.
+        if tab == .tools { return IslandMetrics.windowSize.height - notchSize.height }
         guard tab == .agents else { return IslandMetrics.expandedContentHeight }
         let rows = CGFloat(max(agents.sessions.filter { $0.state != .idle }.count, 1))
         // Шапка 16 + отступ 12 + карточка ~50 (паддинги 18 + две строки) + 6 между карточками + 6 снизу.
@@ -487,10 +490,6 @@ final class IslandModel: ObservableObject {
     var shapeSize: CGSize {
         if let debugFrame { return debugFrame.size }
         let base = CGSize(width: bodySize.width + topRadius * 2, height: bodySize.height)
-        // В инструментах окно тянут за уголок: форма острова растёт вместе с холстом.
-        if tab == .tools, isExpanded, toolsExtra > 0 {
-            return CGSize(width: base.width, height: base.height + toolsExtra)
-        }
         return base
     }
 

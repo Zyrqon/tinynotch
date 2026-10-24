@@ -1,6 +1,26 @@
 import SwiftUI
 import AppKit
 
+/// Жидкое стекло: матовое размытие, световой блик сверху и тонкая светлая кромка.
+/// highlight задаёт силу блика — им «дышит» ховер карточек.
+extension View {
+    func liquidGlass(_ radius: CGFloat, highlight: Double = 0.15) -> some View {
+        background(
+            ZStack {
+                RoundedRectangle(cornerRadius: radius, style: .continuous)
+                    .fill(.ultraThinMaterial)
+                LinearGradient(colors: [.white.opacity(highlight), .white.opacity(0.02)],
+                               startPoint: .top, endPoint: .bottom)
+            }
+            .overlay(
+                RoundedRectangle(cornerRadius: radius, style: .continuous)
+                    .strokeBorder(LinearGradient(colors: [.white.opacity(0.32), .white.opacity(0.05)],
+                                                 startPoint: .top, endPoint: .bottom),
+                                  lineWidth: 0.8))
+        )
+    }
+}
+
 enum ToolClipboard {
     static func copy(_ text: String) {
         let pasteboard = NSPasteboard.general
@@ -36,7 +56,7 @@ struct ToolCopyRow: View {
                 .disabled(text.isEmpty)
         }
         .padding(8)
-        .background(.quinary, in: RoundedRectangle(cornerRadius: 8))
+        .liquidGlass(10, highlight: 0.10)
     }
 }
 
@@ -53,7 +73,6 @@ struct ToolInOut: View {
     }
 }
 
-/// Вкладка «Инструменты»: секции-категории как панели в Blender, поиск и строки тулов.
 /// Вкладка «Инструменты». Написана с нуля.
 /// Ключ к плавности: ховер живёт внутри карточки (перерисовывается одна карточка,
 /// а не вся вкладка), у вкладки нет анимаций на всё поддерево, а высота холста
@@ -78,7 +97,7 @@ struct ToolsTabView: View {
     /// Свой цвет и значок для каждой категории.
     private func accent(for category: String) -> (icon: String, color: Color) {
         switch category {
-        case "Текст": return ("textformat.123", Color.indigo)
+        case "Текст": return ("text.alignleft", Color.indigo)
         case "Счёт": return ("plus.forwardslash.minus", Color.yellow)
         case "Код": return ("chevron.left.forwardslash.fill", Color.teal)
         case "Медиа": return ("photo.on.rectangle.angled.fill", Color.purple)
@@ -126,8 +145,8 @@ struct ToolsTabView: View {
                 Image(systemName: "chevron.left")
                     .font(.system(size: 11, weight: .semibold))
                     .foregroundStyle(.primary)
-                    .frame(width: 24, height: 24)
-                    .background(.quinary, in: RoundedRectangle(cornerRadius: 7))
+                    .frame(width: 26, height: 26)
+                    .liquidGlass(9, highlight: 0.10)
             }
             .buttonStyle(.plain)
             VStack(alignment: .leading, spacing: 1) {
@@ -141,7 +160,7 @@ struct ToolsTabView: View {
     }
 
     private var searchBar: some View {
-        VStack(spacing: 5) {
+        VStack(spacing: 6) {
             HStack(spacing: 8) {
                 Image(systemName: "magnifyingglass")
                     .font(.system(size: 11, weight: .medium))
@@ -153,7 +172,8 @@ struct ToolsTabView: View {
                     .font(.system(size: 10, design: .monospaced).weight(.medium))
                     .foregroundStyle(Color.teal)
                     .padding(.horizontal, 7).padding(.vertical, 3)
-                    .background(Color.teal.opacity(0.12), in: Capsule())
+                    .background(Capsule().fill(Color.teal.opacity(0.14)))
+                    .overlay(Capsule().strokeBorder(Color.teal.opacity(0.25), lineWidth: 0.8))
                 Button {
                     packs.baseOnly.toggle()
                 } label: {
@@ -165,13 +185,14 @@ struct ToolsTabView: View {
                     .font(.caption2.weight(.medium))
                     .foregroundStyle(packs.baseOnly ? Color.orange : Color.teal)
                     .padding(.horizontal, 8).padding(.vertical, 3)
-                    .background(packs.baseOnly ? Color.orange.opacity(0.13) : Color.teal.opacity(0.13), in: Capsule())
+                    .background(Capsule().fill((packs.baseOnly ? Color.orange : Color.teal).opacity(0.14)))
+                    .overlay(Capsule().strokeBorder((packs.baseOnly ? Color.orange : Color.teal).opacity(0.25), lineWidth: 0.8))
                 }
                 .buttonStyle(.plain)
             }
             GeometryReader { geo in
                 ZStack(alignment: .leading) {
-                    Capsule().fill(.quaternary)
+                    Capsule().fill(Color.white.opacity(0.08))
                     Capsule()
                         .fill(LinearGradient(colors: [Color.teal, Color.mint],
                                              startPoint: .leading, endPoint: .trailing))
@@ -180,8 +201,8 @@ struct ToolsTabView: View {
             }
             .frame(height: 2)
         }
-        .padding(.horizontal, 8).padding(.vertical, 5)
-        .background(.quinary, in: RoundedRectangle(cornerRadius: 7))
+        .padding(.horizontal, 10).padding(.vertical, 6)
+        .liquidGlass(12, highlight: 0.10)
     }
 
     private var toolsList: some View {
@@ -203,7 +224,7 @@ struct ToolsTabView: View {
                         .padding(.vertical, 2)
                     }
                 }
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: 118, maximum: 170), spacing: 8)],
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 165, maximum: 260), spacing: 8)],
                           alignment: .leading, spacing: 8) {
                     ForEach(list) { tool in
                         ToolsCard(tool: tool, packs: packs,
@@ -220,7 +241,7 @@ struct ToolsTabView: View {
 
     private func chip(_ title: String, _ category: String?) -> some View {
         let isActive = activeCategory == category
-        let tint = category.map { accent(for: $0).color } ?? Color.secondary
+        let tint = category.map { accent(for: $0).color } ?? Color.teal
         return Button {
             activeCategory = category
         } label: {
@@ -232,16 +253,18 @@ struct ToolsTabView: View {
                 Text(title)
             }
             .font(.system(size: 10.5, weight: .medium))
-            .foregroundStyle(isActive ? Color.white : Color.primary.opacity(0.75))
+            .foregroundStyle(isActive ? Color.white : Color.primary.opacity(0.8))
             .padding(.horizontal, 10).padding(.vertical, 5)
-            .background(isActive ? AnyShapeStyle(tint) : AnyShapeStyle(.quinary), in: Capsule())
+            .background(
+                Capsule().fill(isActive ? AnyShapeStyle(tint.opacity(0.85)) : AnyShapeStyle(.ultraThinMaterial)))
+            .overlay(Capsule().strokeBorder(Color.white.opacity(isActive ? 0.25 : 0.14), lineWidth: 0.8))
         }
         .buttonStyle(.plain)
     }
 }
 
-/// Карточка инструмента. Ховер живёт здесь, внутри карточки: наведение
-/// перерисовывает только её, а не всю вкладку.
+/// Карточка инструмента — горизонтальная строка в жидком стекле. Ховер живёт здесь,
+/// внутри карточки: наведение перерисовывает только её, а не всю вкладку.
 private struct ToolsCard: View {
     let tool: ToolID
     let packs: ToolPackManager
@@ -252,27 +275,29 @@ private struct ToolsCard: View {
 
     var body: some View {
         Button(action: open) {
-            VStack(alignment: .leading, spacing: 5) {
-                HStack(spacing: 5) {
-                    Image(systemName: icon)
-                        .font(.system(size: 9.5, weight: .semibold))
-                        .foregroundStyle(color)
-                    Spacer()
-                    ToolsStatusBadge(tool: tool, packs: packs)
+            HStack(spacing: 9) {
+                Image(systemName: icon)
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(color)
+                    .frame(width: 30, height: 30)
+                    .background(
+                        RoundedRectangle(cornerRadius: 9, style: .continuous)
+                            .fill(color.opacity(hovered ? 0.24 : 0.15)))
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(tool.title)
+                        .font(.system(size: 11.5, weight: .semibold))
+                        .lineLimit(1)
+                        .foregroundStyle(Color.primary)
+                    Text("#\(tool.number)")
+                        .font(.system(size: 9, weight: .medium).monospacedDigit())
+                        .foregroundStyle(Color.secondary.opacity(0.7))
                 }
-                Text(tool.title)
-                    .font(.system(size: 11, weight: .medium))
-                    .lineLimit(2).multilineTextAlignment(.leading)
-                    .foregroundStyle(hovered ? Color.primary : Color.secondary)
-                    .frame(maxWidth: .infinity, minHeight: 24, alignment: .topLeading)
-                Text(tool.category)
-                    .font(.system(size: 8.5, weight: .medium))
-                    .foregroundStyle(color.opacity(0.8))
+                Spacer(minLength: 4)
+                ToolsStatusBadge(tool: tool, packs: packs)
             }
             .padding(9)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .fill(Color.white.opacity(hovered ? 0.09 : 0.05)))
+            .frame(maxWidth: .infinity, minHeight: 48, alignment: .leading)
+            .liquidGlass(14, highlight: hovered ? 0.28 : 0.16)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -298,10 +323,11 @@ private struct ToolsStatusBadge: View {
 
     private func badge(_ text: String, _ color: Color) -> some View {
         Text(text)
-            .font(.system(size: 9.5, weight: .semibold))
-            .foregroundStyle(color.opacity(0.9))
-            .padding(.horizontal, 8).padding(.vertical, 5)
-            .background(.quinary, in: RoundedRectangle(cornerRadius: 7))
+            .font(.system(size: 9, weight: .semibold))
+            .foregroundStyle(color)
+            .padding(.horizontal, 7).padding(.vertical, 3)
+            .background(Capsule().fill(color.opacity(0.16)))
+            .overlay(Capsule().strokeBorder(color.opacity(0.3), lineWidth: 0.8))
     }
 }
 
@@ -361,7 +387,7 @@ struct ToolCard: View {
         }
         .padding(10)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(.quinary, in: RoundedRectangle(cornerRadius: 10))
+        .liquidGlass(12, highlight: 0.12)
         .opacity(locked ? 0.55 : 1)
         .contentShape(RoundedRectangle(cornerRadius: 10))
     }
@@ -391,7 +417,7 @@ struct ToolDetailView: View {
                 } else {
                     toolBody
                         .padding(10)
-                        .background(.quinary, in: RoundedRectangle(cornerRadius: 10))
+                        .liquidGlass(12, highlight: 0.12)
                 }
             }
             .padding(2)
