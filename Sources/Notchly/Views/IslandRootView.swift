@@ -54,7 +54,7 @@ struct IslandRootView: View {
                 // Смена языка пересобирает содержимое целиком — все строки берутся заново.
                 .id(model.settings.language)
                 .frame(width: model.windowSize.width,
-                       height: max(model.windowSize.height, model.notchSize.height + model.expandedContentHeightLive),
+                       height: max(model.windowSize.height, model.notchSize.height + model.expandedContentHeightLive + model.toolsPageExtra),
                        alignment: .top)
                 // Высоту холста не анимируем никогда: вкладка «Инструменты» меняет её,
                 // и анимированная перекладка всего холста каждый кадр дёргала вкладки.
@@ -103,7 +103,7 @@ struct IslandRootView: View {
             ExpandedIslandView(model: model, media: media)
                 // Фиксированный размер: при сворачивании форма обрезает содержимое, а не сжимает его.
                 .frame(width: IslandMetrics.expandedWidth,
-                       height: model.notchSize.height + model.expandedContentHeightLive)
+                       height: model.notchSize.height + model.expandedContentHeightLive + model.toolsPageExtra)
                 // Открытие: виджеты выходят снизу, когда шторка уже опускается.
                 // Закрытие: сначала всё гаснет, потом сворачивается форма.
                 .opacity(model.debugFrame?.content ?? (model.expandedContentVisible ? 1 : 0))
