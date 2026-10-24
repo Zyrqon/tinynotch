@@ -454,7 +454,7 @@ final class IslandModel: ObservableObject {
         if tab == .apps { return 280 }
         // Инструменты: страница рассчитана на полную высоту окна (320 + тяга за полоску),
         // поэтому остров в этой вкладке обязан быть выше стандартных 180.
-        if tab == .tools { return IslandMetrics.windowSize.height - notchSize.height - toolsPageExtra }
+        if tab == .tools { return windowSize.height - notchSize.height - toolsPageExtra }
         guard tab == .agents else { return IslandMetrics.expandedContentHeight }
         let rows = CGFloat(max(agents.sessions.filter { $0.state != .idle }.count, 1))
         // Шапка 16 + отступ 12 + карточка ~50 (паддинги 18 + две строки) + 6 между карточками + 6 снизу.
